@@ -14,6 +14,27 @@ from nbinput import NonBlockingInput
 THUMBSIZE = 20
 
 
+class Input:
+    def __init__(self, y, x):
+        self.y = y
+        self.x = x
+        self.value = ''
+
+    def add(self, char):
+        print(POS_STR(self.y, self.x + len(self.value), char), end='')
+        self.value += char
+
+    def remove(self):
+        print(POS_STR(self.y, self.x + len(self.value) - 1, ' '), end='')
+        self.value = self.value[:-1]
+
+    def set(self, value):
+        print(POS_STR(self.y, self.x, ' ' * len(self.value)), end='')
+        print(POS_STR(self.y, self.x, value), end='')
+        self.value = value
+
+
+
 def get_image_from_url(url):
     return Image.open(BytesIO(request.urlopen(url).read()))
 
@@ -55,6 +76,8 @@ def main():
     albums = lastfm.get_tracks('ollsllo')
     offset = HEIGHT
 
+    answer = Input(HEIGHT - 1, 0)
+
     with NonBlockingInput() as nbi:
         while True:
             if offset >= HEIGHT:
@@ -67,7 +90,15 @@ def main():
 
             offset = scroll_image(image, offset)
 
-            char = str(nbi.char()).lower()
+            char = nbi.char()
+
+            if char == '\b':
+                answer.remove()
+            elif char == '\n':
+                answer.set('')
+                # do something
+            elif char:
+                answer.add(char)
 
             sleep(0.2)
 
