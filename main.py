@@ -4,9 +4,11 @@ from io import BytesIO
 from random import randint
 from time import sleep
 
+
 import convert_image
 import lastfm
 from console import *
+from nbinput import NonBlockingInput
 
 
 THUMBSIZE = 20
@@ -40,27 +42,39 @@ def image_diff(image):
     return diff
 
 
-def scroll_image(image, interval=0.2):
+def scroll_image(image, offset):
     data = convert_image.get_escape_codes(image)
     diff = image_diff(data)
-    y = 0 - len(image)
-    print(HIDE_CUR + CLS)
-    while y < HEIGHT:
-        y += 1
-        print(display_image(y, int(WIDTH / 2 - len(image[0])), diff))
-        sleep(interval)
-    print(SHOW_CUR)
+
+    print(HIDE_CUR + display_image(offset, int(WIDTH / 2 - len(image[0])), diff) + SHOW_CUR)
+
+    return offset + 1
 
 
 def main():
     albums = lastfm.get_tracks('ollsllo')
+    offset = HEIGHT
 
-    album = lastfm.get_album_info(albums[randint(0, len(albums)-1)])
+    with NonBlockingInput() as nbi:
+        while True:
+            if offset >= HEIGHT:
+                album = lastfm.get_album_info(albums[randint(0, len(albums)-1)])
+                image = get_image_from_url(album[2])
+                image.thumbnail((THUMBSIZE, THUMBSIZE), Image.ANTIALIAS)
+                image = convert_image.convert_image(image)
 
-    image = get_image_from_url(album[2])
-    image.thumbnail((THUMBSIZE, THUMBSIZE), Image.ANTIALIAS)
-    scroll_image(convert_image.convert_image(image))
+                offset = 0 - len(image)
+
+            offset = scroll_image(image, offset)
+
+            char = str(nbi.char()).lower()
+
+            sleep(0.2)
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        print(CLS)
+        main()
+    finally:
+        print(SHOW_CUR)
