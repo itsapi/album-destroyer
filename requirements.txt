@@ -1,2 +1,5 @@
 Pillow==3.0.0
+PyAudio==0.2.7
 wheel==0.24.0
+youtube-dl==2015.11.27.1
+
