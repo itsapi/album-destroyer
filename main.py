@@ -7,11 +7,27 @@ from time import sleep
 
 import convert_image
 import lastfm
+from youtube import youtube_search
+from play import get_and_play
 from console import *
 from nbinput import NonBlockingInput
 
 
 THUMBSIZE = 20
+
+
+def play_music(album):
+    found = False
+    for track in album['tracks']:
+        videos = youtube_search(album['title'], album['artist'], track)
+
+        for video in videos:
+            print(video[0])
+            if get_and_play(video[1]):
+                found = True
+                break
+
+        if found: break
 
 
 def get_image_from_url(url):
@@ -58,8 +74,13 @@ def main():
     with NonBlockingInput() as nbi:
         while True:
             if offset >= HEIGHT:
-                album = lastfm.get_album_info(albums[randint(0, len(albums)-1)])
-                image = get_image_from_url(album[2])
+
+                mbid = albums[randint(0, len(albums)-1)]
+                album = lastfm.get_album_info(mbid)
+
+                play_music(album)
+
+                image = get_image_from_url(album['image'])
                 image.thumbnail((THUMBSIZE, THUMBSIZE), Image.ANTIALIAS)
                 image = convert_image.convert_image(image)
 

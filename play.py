@@ -1,9 +1,10 @@
 import os
+import time
 import pyaudio
 import wave
 
 
-def play_wave(filename):
+def play_wave(filename, length=10):
     CHUNK = 1024
 
     wf = wave.open(filename, 'rb')
@@ -16,7 +17,8 @@ def play_wave(filename):
 
     data = wf.readframes(CHUNK)
 
-    while data != '':
+    start = time.time()
+    while data != '' and time.time() < start + length:
         stream.write(data)
         data = wf.readframes(CHUNK)
 
@@ -27,9 +29,19 @@ def play_wave(filename):
 
 
 def get_and_play(url):
-    os.system('youtube-dl -x --audio-format=wav -o song.tmp {}'.format(url))
-    play_wave('song.wav')
-    os.system('rm song.wav')
+    try:
+        os.system('youtube-dl -x --audio-format=wav -o song.tmp {}'.format(url))
+    except:
+        pass
+    else:
+        play_wave('song.wav')
+        return True
+    finally:
+        try:
+            os.system('rm song.wav')
+        except:
+            pass
+
 
 
 if __name__ == '__main__':
