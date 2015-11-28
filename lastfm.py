@@ -44,7 +44,7 @@ def get_album_info(mbid):
         except ValueError:
             size = 5
 
-        if size < smallest_size:
+        if size < smallest_size and image['#text'] is not '':
             smallest_size = size
             smallest = image['#text']
 
