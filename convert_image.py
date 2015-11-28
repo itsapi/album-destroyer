@@ -331,21 +331,13 @@ RGB2SHORT_DICT, SHORT2RGB_DICT = _create_dicts()
 #---------------------------------------------------------------------
 
 def convert_image(image):
-    out = {}
+    out = ''
     for y in range(image.size[1]):
-        out[y] = {}
         for x in range(image.size[0]):
             p = image.getpixel((x,y))
             h = "%2x%2x%2x" % (p[0],p[1],p[2])
             short, rgb = rgb2short(h)
-            out[y][x] = short
-    return out
-
-def get_escape_codes(data):
-    out = ''
-    for y, row in data.items():
-        for x, col in row.items():
-            out += "\033[48;5;%sm  " % col
+            out += "\033[48;5;%sm  " % short
         out += "\033[0m\n"
     out += "\n"
     return out
