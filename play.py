@@ -1,6 +1,6 @@
+import os
 import pyaudio
 import wave
-import sys
 
 
 def play_wave(filename):
@@ -26,5 +26,12 @@ def play_wave(filename):
     p.terminate()
 
 
+def get_and_play(url):
+    os.system('youtube-dl -x --audio-format=wav -o song.tmp {}'.format(url))
+    play_wave('song.wav')
+    os.system('rm song.wav')
+
+
 if __name__ == '__main__':
-    play_wave(sys.argv[1])
+    import sys
+    get_and_play(sys.argv[1])
