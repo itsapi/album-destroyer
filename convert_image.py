@@ -1,4 +1,3 @@
-
 __author__    = 'Micah Elliott http://MicahElliott.com; Kevin Lange <k@dakko.us>'
 __version__   = '0.1'
 __copyright__ = 'Copyright (C) 2011 Micah Elliott.  All rights reserved.'
