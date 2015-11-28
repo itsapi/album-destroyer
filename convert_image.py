@@ -345,10 +345,8 @@ def convert_image(image):
 def get_escape_codes(data):
     out = []
     for y, row in data.items():
-        line = ''
+        line = []
         for x, col in row.items():
-            line += "\033[48;5;%sm  " % col
-        line += "\033[0m\n"
+            line.append("\033[48;5;%sm  \033[0m\n" % col)
         out.append(line)
-    out.append("\n")
     return out
