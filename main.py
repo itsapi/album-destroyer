@@ -1,3 +1,4 @@
+import threading
 from time import sleep
 from queue import Queue
 from difflib import SequenceMatcher as SM
@@ -80,23 +81,20 @@ def main():
 
     queue = Queue()
     queue_next_song(queue, albums)
-    last_play_barrier = None
+    stop_last_song = threading.Event()
 
     i = 0
     with NonBlockingInput() as nbi:
         while True:
             if offset >= HEIGHT:
-                # Wait for song to finish
-                if last_play_barrier:
-                    last_play_barrier.wait()
-
                 print(CLS)
+
+                stop_last_song.set()
 
                 queue_next_song(queue, albums)
 
-                album, image, play_barrier = queue.get(block=True)
+                album, image, play_barrier, stop_last_song = queue.get(block=True)
                 play_barrier.wait()
-                last_play_barrier = play_barrier
 
                 offset = 0 - len(image)
 
