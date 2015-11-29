@@ -113,6 +113,7 @@ def checkscore(album, answer):
 
 def main(username):
     global TOTAL, SCORE
+    print(HIDE_CUR)
 
     albums = lastfm.load_n_albums(username)
     album = None
@@ -123,7 +124,7 @@ def main(username):
     answer = Input(int(HEIGHT / 2), 1, border=True)
 
     msg = 'Game is loading...'
-    print(HIDE_CUR + CLS + POS_STR(int(HEIGHT/2), int((WIDTH-len(msg))/2), msg) + BLACK)
+    print(CLS + POS_STR(int(HEIGHT/2), int((WIDTH-len(msg))/2), msg) + BLACK)
 
     queue = Queue()
     queue_next_song(queue, albums)
