@@ -2,11 +2,11 @@ import sys
 from apiclient.discovery import build
 from apiclient.errors import HttpError
 
+import config
 
-DEVELOPER_KEY = 'AIzaSyD7mGVIkB-1eA-JxzrO1JPI1BMzHbqoHjY'
 
 def youtube_search(album, artist, track):
-    youtube = build('youtube', 'v3', developerKey=DEVELOPER_KEY)
+    youtube = build('youtube', 'v3', developerKey=config.GOOGLE_API_KEY)
 
     search_response = youtube.search().list(
         q = album + ' ' + artist + ' ' + track,
