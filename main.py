@@ -100,7 +100,7 @@ def main():
 
                 offset = 0 - len(image)
 
-            if i % 1 == 0:
+            if i % 5 == 0:
                 offset = scroll_image(image, offset)
             i += 1
 
@@ -114,7 +114,7 @@ def main():
             elif char:
                 answer.add(char)
 
-            sleep(0.05)
+            sleep(0.01)
 
 
 if __name__ == '__main__':

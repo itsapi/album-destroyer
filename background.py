@@ -43,7 +43,7 @@ def get_and_play(mbid, queue):
         for video in videos:
             # print(video[0])
             try:
-                os.system('youtube-dl -x --audio-format=wav -o %\(id\)s.tmp {} > /dev/null 2>&1'.format(video[1]))
+                os.system('youtube-dl -x --audio-format=wav -o videos/%\(id\)s.tmp {} > /dev/null 2>&1'.format(video[1]))
             except Exception as e:
                 print('Failed', e)
                 continue
@@ -51,12 +51,12 @@ def get_and_play(mbid, queue):
                 queue.put((album, image, play_barrier))
                 play_barrier.wait()
                 print(video[0], 'Playing')
-                play.play_wave('{}.wav'.format(video[1]))
+                play.play_wave('videos/{}.wav'.format(video[1]))
                 play_barrier.wait()
                 return
             finally:
                 try:
-                    os.system('rm song.wav song.tmp > /dev/null 2>&1')
+                    os.system('rm -r videos/{}\{.wav,.tmp\} > /dev/null 2>&1'.format(video[1]))
                 except Exception as e:
                     print('Error:', e)
                     pass
