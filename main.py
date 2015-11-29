@@ -90,6 +90,7 @@ def main():
                 print(CLS)
 
                 stop_last_song.set()
+                answer.set('')
 
                 queue_next_song(queue, albums)
 
