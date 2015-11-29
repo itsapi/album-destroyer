@@ -53,7 +53,6 @@ def get_and_play(mbid, queue):
     data = convert_image.get_escape_codes(image)
     diff = image_diff(data)
 
-
     for track in album['tracks']:
         videos = youtube_search(album['title'], album['artist'], track)
 
