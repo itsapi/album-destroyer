@@ -124,6 +124,7 @@ def main(username):
     queue_next_song(queue, albums)
     stop_last_song = threading.Event()
 
+    speed = 1
     i = 0
     with NonBlockingInput() as nbi:
         while True:
@@ -148,7 +149,7 @@ def main(username):
 
                 offset = 0 - len(image)
 
-            if i % 15 == 0:
+            if i % int(100/speed) == 0:
                 offset = scroll_image(diff, image, offset)
             i += 1
 
@@ -160,6 +161,7 @@ def main(username):
                     annimate_death(offset + int(len(image) / 2), int(WIDTH / 2))
                     offset = HEIGHT
                     SCORE += 1
+                    speed += 3
                     status = 'Correct answer!'
                 else:
                     status = 'Incorrect answer :-('
