@@ -116,7 +116,7 @@ def main(username):
 
                 offset = 0 - len(image)
 
-            if i % 5 == 0:
+            if i % 15 == 0:
                 offset = scroll_image(image, offset)
             i += 1
 
