@@ -32,4 +32,10 @@ CLS_END_LN = '\033[0K'
 REDRAW = '\033[0;0f'
 HIDE_CUR = '\033[?25l'
 SHOW_CUR = '\033[?25h'
+SAVE_CUR = '\033[s'
+RESTORE_CUR = '\033[u'
 POS_STR = lambda y, x, s: '\033[{};{}H{}'.format(y+1, x+1, s)
+UP = lambda n=1: '\033[{}A'.format(n)
+DOWN = lambda n=1: '\033[{}B'.format(n)
+RIGHT = lambda n=1: '\033[{}C'.format(n)
+BACK = LEFT = lambda n=1: '\033[{}D'.format(n)

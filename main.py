@@ -1,4 +1,5 @@
 import threading
+import sys
 from time import sleep
 from queue import Queue
 from difflib import SequenceMatcher as SM
@@ -63,8 +64,9 @@ def scroll_image(image, offset):
     return offset + 1
 
 
-def main():
-    albums = lastfm.get_albums('ollsllo')
+def main(username):
+    albums = lastfm.load_n_albums(username)
+
     offset = HEIGHT
 
     answer = Input(HEIGHT - 1, 0)
@@ -117,6 +119,6 @@ def main():
 
 if __name__ == '__main__':
     try:
-        main()
+        main(sys.argv[1])
     finally:
         print(SHOW_CUR)
