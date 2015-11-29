@@ -1,6 +1,11 @@
-import config
+import sys
+import os
 import json
+import time
 import urllib.request
+
+import config
+from console import *
 
 
 page = 0
@@ -23,6 +28,33 @@ def get_albums(user):
     for album in albums_:
         if album not in albums and album is not '':
             albums.append(album)
+
+    return albums, attr
+
+
+def load_n_albums(username):
+    scrobbles_f = 'scrobbles.json'
+
+    albums = None
+    if os.path.isfile(scrobbles_f):
+        with open(scrobbles_f, 'r') as f:
+            data = json.load(f)
+
+        date = data['date']
+        if date + (24 * 60 * 60) > time.time():
+            albums = data['albums']
+
+    if not albums:
+        print('Loading last.fm Scrobbles. ..' + BACK(), end='')
+        albums, attr = get_albums(username)
+        for page in range(min(50, int(attr['totalPages']))):
+            print(':.' + LEFT(), end='')
+            sys.stdout.flush()
+            time.sleep(.1)
+            albums += get_albums(username)[0]
+
+        with open(scrobbles_f, 'w') as f:
+            json.dump({'albums': albums, 'date': time.time()}, f)
 
     return albums
 

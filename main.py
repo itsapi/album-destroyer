@@ -1,5 +1,6 @@
 import sys
 import threading
+import sys
 from time import sleep
 from queue import Queue
 from difflib import SequenceMatcher as SM
@@ -9,6 +10,10 @@ import convert_image
 from console import *
 from nbinput import NonBlockingInput
 from background import queue_next_song
+
+
+SCORE = 0
+TOTAL = 0
 
 
 class Input:
@@ -77,21 +82,19 @@ def scroll_image(image, offset):
     return offset + 1
 
 
-def main():
-    albums = lastfm.get_albums(sys.argv[1])
+def checkscore(album, answer):
+    titleR = SM(None, answer.value.lower(), album['title'].lower()).ratio()
+    artistR = SM(None, answer.value.lower(), album['artist'].lower()).ratio()
+
+    return titleR > .8 or artistR > .8
+
+
+def main(username):
+    global TOTAL, SCORE
+
     offset = HEIGHT
-
     answer = Input(int(HEIGHT / 2) - 5, 1, border=True)
-
-    def checkscore(album):
-        titleR = SM(None, answer.value.lower(), album['title'].lower()).ratio()
-        artistR = SM(None, answer.value.lower(), album['artist'].lower()).ratio()
-
-        if titleR > .8 or artistR > .8:
-            outcome = HEIGHT
-            print(POS_STR(int(HEIGHT / 2), 2, 'Correct answer!'))
-        else:
-            print(POS_STR(int(HEIGHT / 2), 2, 'Incorrect answer :-('))
+    albums = lastfm.load_n_albums(username)
 
     queue = Queue()
     queue_next_song(queue, albums)
@@ -103,6 +106,7 @@ def main():
             if offset >= HEIGHT:
                 print(CLS)
                 answer.render()
+                TOTAL += 1
 
                 stop_last_song.set()
                 queue_next_song(queue, albums)
@@ -120,8 +124,13 @@ def main():
             if char == chr(127):
                 answer.remove()
             elif char == chr(10):
-                checkscore(album)
-                answer.set('')
+                if checkscore(album, answer):
+                    offset = HEIGHT
+                    SCORE += 1
+                    answer.set('')
+                    print(POS_STR(int(HEIGHT / 2), 2, 'Correct answer!'))
+                else:
+                    print(POS_STR(int(HEIGHT / 2), 2, 'Incorrect answer :-('))
             elif char:
                 answer.add(char)
 
@@ -130,6 +139,6 @@ def main():
 
 if __name__ == '__main__':
     try:
-        main()
+        main(sys.argv[1])
     finally:
-        print(SHOW_CUR)
+        print(SHOW_CUR, '{}/{}'.format(SCORE, TOTAL))
