@@ -119,6 +119,7 @@ def main(username):
     albums = lastfm.load_n_albums(username)
     album = None
     status = None
+    last_album = None
 
     queue = Queue()
     queue_next_song(queue, albums)
@@ -130,7 +131,8 @@ def main(username):
         while True:
             if offset >= HEIGHT:
                 if album:
-                    print(END + WHITE + sidebar_info(album, status) + END + BLACK)
+                    last_album = album
+                    print(END + WHITE + sidebar_info(last_album, status) + END + BLACK)
                     status = None
                     sleep(2)
 
@@ -168,7 +170,8 @@ def main(username):
             elif char == chr(27):
                 char = 0
                 msg = '---- PAUSED (esc to close, q to quit game) ----'
-                print(END + WHITE + sidebar_info(album, status) + END + BLACK)
+                if last_album:
+                    print(END + WHITE + sidebar_info(last_album, status) + END + BLACK)
                 print(WHITE + POS_STR(2, int((WIDTH-len(msg))/2), msg) + END)
                 pause_music.set()
                 while not char in (chr(27), chr(113)):
