@@ -12,6 +12,10 @@ from nbinput import NonBlockingInput
 from background import queue_next_song
 
 
+SCORE = 0
+TOTAL = 0
+
+
 class Input:
     def __init__(self, y, x):
         self.y = y
@@ -65,22 +69,21 @@ def scroll_image(image, offset):
     return offset + 1
 
 
+def checkscore(album, answer):
+    titleR = SM(None, answer.value.lower(), album['title'].lower()).ratio()
+    artistR = SM(None, answer.value.lower(), album['artist'].lower()).ratio()
+
+    return titleR > .8 or artistR > .8
+
+
 def main(username):
+    global TOTAL, SCORE
+
     albums = lastfm.load_n_albums(username)
 
     offset = HEIGHT
 
     answer = Input(HEIGHT - 1, 0)
-
-    def checkscore(album):
-        titleR = SM(None, answer.value.lower(), album['title'].lower()).ratio()
-        artistR = SM(None, answer.value.lower(), album['artist'].lower()).ratio()
-
-        if titleR > .8 or artistR > .8:
-            outcome = HEIGHT
-            print(CLS + 'Correct answer!')
-        else:
-            print(CLS + 'Incorrect answer :-(')
 
     queue = Queue()
     queue_next_song(queue, albums)
@@ -91,6 +94,7 @@ def main(username):
         while True:
             if offset >= HEIGHT:
                 print(CLS)
+                TOTAL += 1
 
                 stop_last_song.set()
                 answer.set('')
@@ -111,7 +115,13 @@ def main(username):
             if char == '\b':
                 answer.remove()
             elif char == '\n':
-                checkscore(album)
+                if checkscore(album, answer):
+                    offset = HEIGHT
+                    SCORE += 1
+                    print(CLS + 'Correct answer!')
+                else:
+                    print('Incorrect answer :-(')
+
                 answer.set('')
             elif char:
                 answer.add(char)
@@ -123,4 +133,4 @@ if __name__ == '__main__':
     try:
         main(sys.argv[1])
     finally:
-        print(SHOW_CUR)
+        print(SHOW_CUR, '{}/{}'.format(SCORE, TOTAL))
