@@ -60,21 +60,7 @@ def display_image(y, x, diff):
     return out
 
 
-def image_diff(image):
-    diff = {}
-    prev_row = {}
-    for dy, row in enumerate(image[::-1]):
-        diff[len(image) - dy - 1] = {}
-        for dx, col in enumerate(row):
-            if not prev_row.get(dx) == col:
-                prev_row[dx] = diff[len(image) - dy - 1][dx] = col
-    return diff
-
-
-def scroll_image(image, offset):
-    data = convert_image.get_escape_codes(image)
-    diff = image_diff(data)
-
+def scroll_image(diff, image, offset):
     print(HIDE_CUR + display_image(offset, int(WIDTH / 2 - len(image[0])), diff) + SHOW_CUR)
 
     return offset + 1
@@ -117,7 +103,8 @@ def main(username):
                 stop_last_song.set()
                 queue_next_song(queue, albums)
 
-                album, image, play_barrier, stop_last_song = queue.get(block=True)
+                album, image, diff, play_barrier, stop_last_song = queue.get(block=True)
+
                 play_barrier.wait()
 
                 answer.set('')
@@ -127,7 +114,7 @@ def main(username):
                 offset = 0 - len(image)
 
             if i % 15 == 0:
-                offset = scroll_image(image, offset)
+                offset = scroll_image(diff, image, offset)
             i += 1
 
             char = nbi.char()
