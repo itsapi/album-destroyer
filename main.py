@@ -184,6 +184,7 @@ def main(username):
                 print(POS_STR(2, int((WIDTH-len(msg))/2), int((WIDTH-len(msg))/2) * ' ') + BLACK)
                 pause_music.clear()
                 if char == chr(113):
+                    print(CLS)
                     sys.exit(0)
             elif char:
                 answer.add(char)
@@ -195,4 +196,4 @@ if __name__ == '__main__':
     try:
         main(sys.argv[1])
     finally:
-        print(SHOW_CUR, '{}/{}'.format(SCORE, TOTAL))
+        print(SHOW_CUR, 'Final Score: {}/{}\n'.format(SCORE, TOTAL))
