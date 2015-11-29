@@ -1,12 +1,15 @@
 import sys
 import threading
 import sys
+from math import cos, sin, radians
+from random import random
 from time import sleep
 from queue import Queue
 from difflib import SequenceMatcher as SM
 
 import lastfm
 import convert_image
+from colors import *
 from console import *
 from nbinput import NonBlockingInput
 from background import queue_next_song
@@ -50,6 +53,30 @@ class Input:
         self.render(' ')
         self.value = value
         self.render()
+
+
+def annimate_death(y, x):
+    for fy in range(HEIGHT - 1, y, -1):
+        print(POS_STR(fy, x, colorStr('|', fg=RED, bg=YELLOW, style=BOLD)), end='')
+        sys.stdout.flush()
+        sleep(.01)
+
+    for d in range(5):
+        d *= d
+        out = ''
+        for a in range(30):
+            a *= 360/30
+
+            bg = YELLOW if (random() * d) < 5 else RED
+
+            ax = x + 2*int(random() * d * cos(radians(a)))
+            ay = y + int(random() * d * sin(radians(a)))
+            ay1 = min(HEIGHT-1, max(1, ay))
+            ay2 = min(HEIGHT-1, max(1, ay-1))
+            out += POS_STR(ay1, ax, colorStr('**', fg=RED, bg=bg, style=BOLD))
+            out += POS_STR(ay2, ax, colorStr('**', fg=RED, bg=bg, style=BOLD))
+        print(out, end='')
+        sleep(.01)
 
 
 def display_image(y, x, diff):
@@ -129,6 +156,7 @@ def main(username):
                 answer.remove()
             elif char == chr(10):
                 if checkscore(album, answer):
+                    annimate_death(offset + int(len(image) / 2), int(WIDTH / 2))
                     offset = HEIGHT
                     SCORE += 1
                     status = 'Correct answer!'
