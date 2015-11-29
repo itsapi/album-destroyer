@@ -33,7 +33,11 @@ def get_albums(user):
 
 
 def load_n_albums(username):
-    scrobbles_f = 'scrobbles.json'
+    scrobbles_d = 'scrobbles'
+    scrobbles_f = os.path.join('scrobbles', username + '.json')
+
+    if not os.path.exists(scrobbles_d):
+        os.mkdir(scrobbles_d)
 
     albums = None
     if os.path.isfile(scrobbles_f):
