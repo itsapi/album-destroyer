@@ -61,7 +61,7 @@ def get_and_play(url):
         success = play_wave('song.wav')
     finally:
         try:
-            os.system('rm song.wav > /dev/null 2>&1')
+            os.system('rm song.wav song.tmp > /dev/null 2>&1')
         except:
             pass
 
