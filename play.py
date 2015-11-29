@@ -6,6 +6,9 @@ import pyaudio
 import wave
 
 
+MUSIC_LENGTH = 25
+
+
 ERROR_HANDLER_FUNC = CFUNCTYPE(None, c_char_p, c_int, c_char_p, c_int, c_char_p)
 def py_error_handler(filename, line, function, err, fmt):
     pass
@@ -19,7 +22,7 @@ def noalsaerr():
     asound.snd_lib_error_set_handler(None)
 
 
-def play_wave(filename, length=10):
+def play_wave(filename):
     CHUNK = 1024
 
     try:
@@ -38,7 +41,7 @@ def play_wave(filename, length=10):
         data = wf.readframes(CHUNK)
 
         start = time.time()
-        while data != '' and time.time() < start + length:
+        while data != '' and time.time() < start + MUSIC_LENGTH:
             stream.write(data)
             data = wf.readframes(CHUNK)
 
@@ -48,25 +51,6 @@ def play_wave(filename, length=10):
         p.terminate()
 
     return True
-
-
-def get_and_play(url):
-    success = False
-
-    try:
-        os.system('youtube-dl -x --audio-format=wav -o song.tmp {} > /dev/null 2>&1'.format(url))
-    except:
-        pass
-    else:
-        success = play_wave('song.wav')
-    finally:
-        try:
-            os.system('rm song.wav song.tmp > /dev/null 2>&1')
-        except:
-            pass
-
-    return success
-
 
 
 if __name__ == '__main__':

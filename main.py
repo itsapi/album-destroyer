@@ -1,19 +1,12 @@
-from urllib import request
-from PIL import Image
-from io import BytesIO
-from random import randint
 from time import sleep
+from queue import Queue
 from difflib import SequenceMatcher as SM
 
-import convert_image
 import lastfm
-from youtube import youtube_search
-from play import get_and_play
+import convert_image
 from console import *
 from nbinput import NonBlockingInput
-
-
-THUMBSIZE = 20
+from background import queue_next_song
 
 
 class Input:
@@ -34,27 +27,6 @@ class Input:
         print(POS_STR(self.y, self.x, ' ' * len(self.value)), end='')
         print(POS_STR(self.y, self.x, value), end='')
         self.value = value
-
-
-def play_music(album):
-    found = False
-    for track in album['tracks']:
-        videos = youtube_search(album['title'], album['artist'], track)
-
-        for video in videos:
-            print(video[0])
-            if get_and_play(video[1]):
-                found = True
-                break
-
-        if found: break
-
-
-def get_image_from_url(url):
-    try:
-        return Image.open(BytesIO(request.urlopen(url).read()))
-    except AttributeError:
-        return
 
 
 def display_image(y, x, diff):
@@ -106,32 +78,31 @@ def main():
         else:
             print(CLS + 'Incorrect answer :-(')
 
+    queue = Queue()
+    queue_next_song(queue, albums)
+    last_play_barrier = None
 
+    i = 0
     with NonBlockingInput() as nbi:
         while True:
             if offset >= HEIGHT:
+                # Wait for song to finish
+                if last_play_barrier:
+                    last_play_barrier.wait()
+
                 print(CLS)
 
-                mbid = albums[randint(0, len(albums)-1)]
-                album = lastfm.get_album_info(mbid)
+                queue_next_song(queue, albums)
 
-                play_music(album)
-
-                image = None
-                for i in range(5):
-                    image = get_image_from_url(album['image'])
-                    if image:
-                        break
-                if not image:
-                    print('error!')
-                    return
-
-                image.thumbnail((THUMBSIZE, THUMBSIZE), Image.ANTIALIAS)
-                image = convert_image.convert_image(image)
+                album, image, play_barrier = queue.get(block=True)
+                play_barrier.wait()
+                last_play_barrier = play_barrier
 
                 offset = 0 - len(image)
 
-            offset = scroll_image(image, offset)
+            if i % 1 == 0:
+                offset = scroll_image(image, offset)
+            i += 1
 
             char = nbi.char()
 
@@ -143,7 +114,7 @@ def main():
             elif char:
                 answer.add(char)
 
-            sleep(0.2)
+            sleep(0.05)
 
 
 if __name__ == '__main__':
