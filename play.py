@@ -22,13 +22,13 @@ def noalsaerr():
     asound.snd_lib_error_set_handler(None)
 
 
-def play_wave(filename):
+def play_wave(filename, stop):
     CHUNK = 1024
 
     try:
         wf = wave.open(filename, 'rb')
     except FileNotFoundError:
-        return False
+        return
 
     with noalsaerr():
         p = pyaudio.PyAudio()
@@ -41,7 +41,7 @@ def play_wave(filename):
         data = wf.readframes(CHUNK)
 
         start = time.time()
-        while data != '' and time.time() < start + MUSIC_LENGTH:
+        while data != '' and time.time() < start + MUSIC_LENGTH and not stop.is_set():
             stream.write(data)
             data = wf.readframes(CHUNK)
 
@@ -49,8 +49,6 @@ def play_wave(filename):
         stream.close()
 
         p.terminate()
-
-    return True
 
 
 if __name__ == '__main__':
