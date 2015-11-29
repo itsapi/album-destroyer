@@ -3,7 +3,7 @@ from PIL import Image
 from io import BytesIO
 from random import randint
 from time import sleep
-
+from difflib import SequenceMatcher as SM
 
 import convert_image
 import lastfm
@@ -93,9 +93,21 @@ def main():
 
     answer = Input(HEIGHT - 1, 0)
 
+    def checkscore(album):
+        titleR = SM(None, answer.value.lower(), album['title'].lower()).ratio()
+        artistR = SM(None, answer.value.lower(), album['artist'].lower()).ratio()
+
+        if titleR > .8 or artistR > .8:
+            outcome = HEIGHT
+            print(CLS + 'Correct answer!')
+        else:
+            print(CLS + 'Incorrect answer :-(')
+
+
     with NonBlockingInput() as nbi:
         while True:
             if offset >= HEIGHT:
+                print(CLS)
 
                 mbid = albums[randint(0, len(albums)-1)]
                 album = lastfm.get_album_info(mbid)
@@ -115,8 +127,8 @@ def main():
             if char == '\b':
                 answer.remove()
             elif char == '\n':
+                checkscore(album)
                 answer.set('')
-                # do something
             elif char:
                 answer.add(char)
 
@@ -125,7 +137,6 @@ def main():
 
 if __name__ == '__main__':
     try:
-        print(CLS)
         main()
     finally:
         print(SHOW_CUR)
