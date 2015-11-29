@@ -114,12 +114,16 @@ def checkscore(album, answer):
 def main(username):
     global TOTAL, SCORE
 
-    offset = HEIGHT
-    answer = Input(int(HEIGHT / 2), 1, border=True)
     albums = lastfm.load_n_albums(username)
     album = None
     status = None
     last_album = None
+
+    offset = HEIGHT
+    answer = Input(int(HEIGHT / 2), 1, border=True)
+
+    msg = 'Game is loading...'
+    print(HIDE_CUR + CLS + POS_STR(int(HEIGHT/2), int((WIDTH-len(msg))/2), msg) + BLACK)
 
     queue = Queue()
     queue_next_song(queue, albums)
@@ -188,8 +192,6 @@ def main(username):
 
 if __name__ == '__main__':
     try:
-        msg = 'Game is loading...'
-        print(HIDE_CUR + CLS + POS_STR(int(HEIGHT/2), int((WIDTH-len(msg))/2), msg) + BLACK)
         main(sys.argv[1])
     finally:
         print(SHOW_CUR, '{}/{}'.format(SCORE, TOTAL))
