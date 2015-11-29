@@ -3,6 +3,7 @@ import sys
 from time import sleep
 from queue import Queue
 from difflib import SequenceMatcher as SM
+from os import getenv
 
 import lastfm
 import convert_image
@@ -92,6 +93,7 @@ def main(username):
                 print(CLS)
 
                 stop_last_song.set()
+                answer.set('')
 
                 queue_next_song(queue, albums)
 
