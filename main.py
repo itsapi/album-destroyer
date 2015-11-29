@@ -23,11 +23,7 @@ class Input:
         self.value = ''
         self.border = border
 
-    def render(self):
-        self.draw(' ')
-        self.draw()
-
-    def draw(self, char='●'):
+    def render(self, char='●'):
         print(POS_STR(self.y, self.x, ' ' + self.value + ' '), end='')
         if self.border:
             print(POS_STR(self.y-1, self.x-1, char * (4 + len(self.value))) + ' ', end='')
@@ -37,14 +33,17 @@ class Input:
         print(MOVE_CURSOR(HEIGHT, 0), end='')
 
     def add(self, char):
+        self.render(' ')
         self.value += char
         self.render()
 
     def remove(self):
+        self.render(' ')
         self.value = self.value[:-1]
         self.render()
 
     def set(self, value):
+        self.render(' ')
         self.value = value
         self.render()
 
@@ -104,6 +103,7 @@ def main(username):
     with NonBlockingInput() as nbi:
         while True:
             if offset >= HEIGHT:
+                answer.set('')
                 print(CLS)
                 answer.render()
                 TOTAL += 1
@@ -127,8 +127,8 @@ def main(username):
                 if checkscore(album, answer):
                     offset = HEIGHT
                     SCORE += 1
-                    answer.set('')
-                    print(POS_STR(int(HEIGHT / 2), 2, 'Correct answer!'))
+                    print(POS_STR(int(HEIGHT / 2), 2, 'Correct answer! (enter to continue)'))
+                    input()
                 else:
                     print(POS_STR(int(HEIGHT / 2), 2, 'Incorrect answer :-('))
             elif char:
