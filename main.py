@@ -51,7 +51,10 @@ def play_music(album):
 
 
 def get_image_from_url(url):
-    return Image.open(BytesIO(request.urlopen(url).read()))
+    try:
+        return Image.open(BytesIO(request.urlopen(url).read()))
+    except AttributeError:
+        return
 
 
 def display_image(y, x, diff):
@@ -114,7 +117,15 @@ def main():
 
                 play_music(album)
 
-                image = get_image_from_url(album['image'])
+                image = None
+                for i in range(5):
+                    image = get_image_from_url(album['image'])
+                    if image:
+                        break
+                if not image:
+                    print('error!')
+                    return
+
                 image.thumbnail((THUMBSIZE, THUMBSIZE), Image.ANTIALIAS)
                 image = convert_image.convert_image(image)
 
