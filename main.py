@@ -30,7 +30,6 @@ class Input:
             print(POS_STR(self.y+1, self.x-1, char * (4 + len(self.value))) + ' ', end='')
             print(POS_STR(self.y, self.x-1, char + ' '), end='')
             print(POS_STR(self.y, self.x+len(self.value)+2, char + ' '), end='')
-        print(MOVE_CURSOR(HEIGHT, 0), end='')
 
     def add(self, char):
         self.render(' ')
@@ -92,8 +91,10 @@ def main(username):
     global TOTAL, SCORE
 
     offset = HEIGHT
-    answer = Input(int(HEIGHT / 2) - 5, 1, border=True)
+    answer = Input(int(HEIGHT / 2), 1, border=True)
     albums = lastfm.load_n_albums(username)
+    album = None
+    status = None
 
     queue = Queue()
     queue_next_song(queue, albums)
@@ -103,9 +104,14 @@ def main(username):
     with NonBlockingInput() as nbi:
         while True:
             if offset >= HEIGHT:
-                answer.set('')
-                print(CLS)
-                answer.render()
+                if album:
+                    print(POS_STR(int(HEIGHT / 2) + 3, 2, 'Last round results:'))
+                    print(POS_STR(int(HEIGHT / 2) + 4, 2, status or 'No answer entered'))
+                    print(POS_STR(int(HEIGHT / 2) + 5, 2, '{} - {}'.format(album['title'], album['artist'])))
+                    print(POS_STR(int(HEIGHT / 2) + 6, 2, 'Score {} of {}'.format(SCORE, TOTAL)))
+                    status = None
+                    sleep(2)
+
                 TOTAL += 1
 
                 stop_last_song.set()
@@ -113,6 +119,10 @@ def main(username):
 
                 album, image, play_barrier, stop_last_song = queue.get(block=True)
                 play_barrier.wait()
+
+                answer.set('')
+                print(CLS)
+                answer.render()
 
                 offset = 0 - len(image)
 
@@ -127,10 +137,9 @@ def main(username):
                 if checkscore(album, answer):
                     offset = HEIGHT
                     SCORE += 1
-                    print(POS_STR(int(HEIGHT / 2), 2, 'Correct answer! (enter to continue)'))
-                    input()
+                    status = 'Correct answer!'
                 else:
-                    print(POS_STR(int(HEIGHT / 2), 2, 'Incorrect answer :-('))
+                    status = 'Incorrect answer :-('
             elif char:
                 answer.add(char)
 
@@ -139,6 +148,8 @@ def main(username):
 
 if __name__ == '__main__':
     try:
+        msg = 'Game is loading'
+        print(CLS + POS_STR(int(HEIGHT/2), int((WIDTH-len(msg))/2), msg))
         main(sys.argv[1])
     finally:
         print(SHOW_CUR, '{}/{}'.format(SCORE, TOTAL))
