@@ -4,11 +4,11 @@ import urllib.request
 
 
 page = 0
-def get_tracks(user):
+def get_albums(user):
     global page
     page += 1
 
-    url = 'http://ws.audioscrobbler.com/2.0/?method=user.getRecentTracks&api_key={}&format=json&user={}&page={}'.format(config.api_key, user, page)
+    url = 'http://ws.audioscrobbler.com/2.0/?method=user.getRecentTracks&api_key={}&format=json&user={}&page={}'.format(config.LASTFM_API_KEY, user, page)
     with urllib.request.urlopen(url) as f:
         result = f.read()
 
@@ -29,7 +29,7 @@ def get_tracks(user):
 
 def get_album_info(mbid):
 
-    url = 'http://ws.audioscrobbler.com/2.0/?method=album.getInfo&api_key={}&format=json&mbid={}'.format(config.api_key, mbid)
+    url = 'http://ws.audioscrobbler.com/2.0/?method=album.getInfo&api_key={}&format=json&mbid={}'.format(config.LASTFM_API_KEY, mbid)
     with urllib.request.urlopen(url) as f:
         result = f.read()
 
