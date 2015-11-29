@@ -1,8 +1,8 @@
+import sys
 import threading
 from time import sleep
 from queue import Queue
 from difflib import SequenceMatcher as SM
-from os import getenv
 
 import lastfm
 import convert_image
@@ -65,7 +65,7 @@ def scroll_image(image, offset):
 
 
 def main():
-    albums = lastfm.get_albums(getenv('username'))
+    albums = lastfm.get_albums(sys.argv[1])
     offset = HEIGHT
 
     answer = Input(HEIGHT - 1, 0)
