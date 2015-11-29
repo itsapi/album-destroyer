@@ -12,23 +12,36 @@ from background import queue_next_song
 
 
 class Input:
-    def __init__(self, y, x):
+    def __init__(self, y, x, border=False):
         self.y = y
         self.x = x
         self.value = ''
+        self.border = border
+
+    def render(self):
+        self.draw(' ')
+        self.draw()
+
+    def draw(self, char='●'):
+        print(POS_STR(self.y, self.x, ' ' + self.value + ' '), end='')
+        if self.border:
+            print(POS_STR(self.y-1, self.x-1, char * (4 + len(self.value))) + ' ', end='')
+            print(POS_STR(self.y+1, self.x-1, char * (4 + len(self.value))) + ' ', end='')
+            print(POS_STR(self.y, self.x-1, char + ' '), end='')
+            print(POS_STR(self.y, self.x+len(self.value)+2, char + ' '), end='')
+        print(MOVE_CURSOR(HEIGHT, 0), end='')
 
     def add(self, char):
-        print(POS_STR(self.y, self.x + len(self.value), char), end='')
         self.value += char
+        self.render()
 
     def remove(self):
-        print(POS_STR(self.y, self.x + len(self.value) - 1, ' '), end='')
         self.value = self.value[:-1]
+        self.render()
 
     def set(self, value):
-        print(POS_STR(self.y, self.x, ' ' * len(self.value)), end='')
-        print(POS_STR(self.y, self.x, value), end='')
         self.value = value
+        self.render()
 
 
 def display_image(y, x, diff):
@@ -68,7 +81,7 @@ def main():
     albums = lastfm.get_albums(sys.argv[1])
     offset = HEIGHT
 
-    answer = Input(HEIGHT - 1, 0)
+    answer = Input(int(HEIGHT / 2) - 5, 1, border=True)
 
     def checkscore(album):
         titleR = SM(None, answer.value.lower(), album['title'].lower()).ratio()
@@ -76,9 +89,9 @@ def main():
 
         if titleR > .8 or artistR > .8:
             outcome = HEIGHT
-            print(CLS + 'Correct answer!')
+            print(POS_STR(int(HEIGHT / 2), 2, 'Correct answer!'))
         else:
-            print(CLS + 'Incorrect answer :-(')
+            print(POS_STR(int(HEIGHT / 2), 2, 'Incorrect answer :-('))
 
     queue = Queue()
     queue_next_song(queue, albums)
@@ -89,10 +102,9 @@ def main():
         while True:
             if offset >= HEIGHT:
                 print(CLS)
+                answer.render()
 
                 stop_last_song.set()
-                answer.set('')
-
                 queue_next_song(queue, albums)
 
                 album, image, play_barrier, stop_last_song = queue.get(block=True)
@@ -105,10 +117,9 @@ def main():
             i += 1
 
             char = nbi.char()
-
-            if char == '\b':
+            if char == chr(127):
                 answer.remove()
-            elif char == '\n':
+            elif char == chr(10):
                 checkscore(album)
                 answer.set('')
             elif char:
