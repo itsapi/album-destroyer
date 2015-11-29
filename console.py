@@ -32,6 +32,7 @@ CLS_END_LN = '\033[0K'
 REDRAW = '\033[0;0f'
 HIDE_CUR = '\033[?25l'
 SHOW_CUR = '\033[?25h'
+MOVE_CURSOR = lambda y, x: '\033[{};{}H'.format(y, x)
 SAVE_CUR = '\033[s'
 RESTORE_CUR = '\033[u'
 POS_STR = lambda y, x, s: '\033[{};{}H{}'.format(y+1, x+1, s)
