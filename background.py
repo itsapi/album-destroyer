@@ -14,6 +14,17 @@ from youtube import youtube_search
 THUMBSIZE = 20
 
 
+def image_diff(image):
+    diff = {}
+    prev_row = {}
+    for dy, row in enumerate(image[::-1]):
+        diff[len(image) - dy - 1] = {}
+        for dx, col in enumerate(row):
+            if not prev_row.get(dx) == col:
+                prev_row[dx] = diff[len(image) - dy - 1][dx] = col
+    return diff
+
+
 def get_image_from_url(url):
     try:
         return Image.open(BytesIO(request.urlopen(url).read()))
@@ -37,6 +48,9 @@ def get_and_play(mbid, queue):
 
     image.thumbnail((THUMBSIZE, THUMBSIZE), Image.ANTIALIAS)
     image = convert_image.convert_image(image)
+    data = convert_image.get_escape_codes(image)
+    diff = image_diff(data)
+
 
     for track in album['tracks']:
         videos = youtube_search(album['title'], album['artist'], track)
@@ -49,7 +63,7 @@ def get_and_play(mbid, queue):
                 print('Failed', e)
                 continue
             else:
-                queue.put((album, image, play_barrier, stop_song))
+                queue.put((album, image, diff, play_barrier, stop_song))
                 play_barrier.wait()
                 # print(video[0], 'Playing')
                 play.play_wave('videos/{}.wav'.format(video[1]), stop_song)
