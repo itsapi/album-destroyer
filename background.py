@@ -56,7 +56,7 @@ def get_and_play(mbid, queue):
                 return
             finally:
                 try:
-                    os.system('rm -r videos/{}\{.wav,.tmp\} > /dev/null 2>&1'.format(video[1]))
+                    os.system('rm videos/{}{{.wav,.tmp}} > /dev/null 2>&1'.format(video[1]))
                 except Exception as e:
                     print('Error:', e)
                     pass
