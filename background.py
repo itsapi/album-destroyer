@@ -51,7 +51,7 @@ def get_and_play(mbid, queue):
             else:
                 queue.put((album, image, play_barrier, stop_song))
                 play_barrier.wait()
-                print(video[0], 'Playing')
+                # print(video[0], 'Playing')
                 play.play_wave('videos/{}.wav'.format(video[1]), stop_song)
                 return
             finally:
