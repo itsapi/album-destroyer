@@ -1,12 +1,8 @@
 import os
-import time
 from contextlib import contextmanager
 from ctypes import *
 import pyaudio
 import wave
-
-
-MUSIC_LENGTH = 25
 
 
 ERROR_HANDLER_FUNC = CFUNCTYPE(None, c_char_p, c_int, c_char_p, c_int, c_char_p)
@@ -40,8 +36,7 @@ def play_wave(filename, pause, stop):
 
         data = wf.readframes(CHUNK)
 
-        start = time.time()
-        while data != '' and time.time() < start + MUSIC_LENGTH and not stop.is_set():
+        while data != '' and not stop.is_set():
             while pause.is_set():
                 pass
             stream.write(data)
