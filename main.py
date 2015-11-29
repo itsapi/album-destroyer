@@ -15,6 +15,10 @@ from background import queue_next_song
 SCORE = 0
 TOTAL = 0
 
+BLACK = '\033[30m'
+WHITE = '\033[37m'
+END = '\033[0m'
+
 
 class Input:
     def __init__(self, y, x, border=False):
@@ -24,12 +28,13 @@ class Input:
         self.border = border
 
     def render(self, char='●'):
-        print(POS_STR(self.y, self.x, ' ' + self.value + ' '), end='')
+        out = END + WHITE + POS_STR(self.y, self.x, ' ' + self.value + ' ')
         if self.border:
-            print(POS_STR(self.y-1, self.x-1, char * (4 + len(self.value))) + ' ', end='')
-            print(POS_STR(self.y+1, self.x-1, char * (4 + len(self.value))) + ' ', end='')
-            print(POS_STR(self.y, self.x-1, char + ' '), end='')
-            print(POS_STR(self.y, self.x+len(self.value)+2, char + ' '), end='')
+            out += POS_STR(self.y-1, self.x-1, char * (4 + len(self.value))) + ' '
+            out += POS_STR(self.y+1, self.x-1, char * (4 + len(self.value))) + ' '
+            out += POS_STR(self.y, self.x-1, char + ' ')
+            out += POS_STR(self.y, self.x+len(self.value)+2, char + ' ')
+        print(out + END + MOVE_CURSOR(0, 0) + BLACK)
 
     def add(self, char):
         self.render(' ')
@@ -61,7 +66,7 @@ def display_image(y, x, diff):
 
 
 def scroll_image(diff, image, offset):
-    print(HIDE_CUR + display_image(offset, int(WIDTH / 2 - len(image[0])), diff) + SHOW_CUR)
+    print(END + display_image(offset, int(WIDTH / 2 - len(image[0])), diff) + BLACK)
 
     return offset + 1
 
@@ -91,10 +96,12 @@ def main(username):
         while True:
             if offset >= HEIGHT:
                 if album:
-                    print(POS_STR(int(HEIGHT / 2) + 3, 2, 'Last round results:'))
-                    print(POS_STR(int(HEIGHT / 2) + 4, 2, status or 'No answer entered'))
-                    print(POS_STR(int(HEIGHT / 2) + 5, 2, '{} - {}'.format(album['title'], album['artist'])))
-                    print(POS_STR(int(HEIGHT / 2) + 6, 2, 'Score {} of {}'.format(SCORE, TOTAL)))
+                    out = END + WHITE
+                    out += POS_STR(int(HEIGHT / 2) + 3, 2, 'Last round results:')
+                    out += POS_STR(int(HEIGHT / 2) + 4, 2, status or 'No answer entered')
+                    out += POS_STR(int(HEIGHT / 2) + 5, 2, '{} - {}'.format(album['title'], album['artist']))
+                    out += POS_STR(int(HEIGHT / 2) + 6, 2, 'Score {} of {}'.format(SCORE, TOTAL))
+                    print(out + END + BLACK)
                     status = None
                     sleep(2)
 
@@ -135,8 +142,8 @@ def main(username):
 
 if __name__ == '__main__':
     try:
-        msg = 'Game is loading'
-        print(CLS + POS_STR(int(HEIGHT/2), int((WIDTH-len(msg))/2), msg))
+        msg = 'Game is loading...'
+        print(HIDE_CUR + CLS + POS_STR(int(HEIGHT/2), int((WIDTH-len(msg))/2), msg) + BLACK)
         main(sys.argv[1])
     finally:
         print(SHOW_CUR, '{}/{}'.format(SCORE, TOTAL))
