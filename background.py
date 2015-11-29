@@ -39,11 +39,12 @@ def get_and_play(mbid, queue):
     album = lastfm.get_album_info(mbid)
 
     image = None
-    for i in range(5):
+    for i in range(20):
         image = get_image_from_url(album['image'])
         if image:
             break
     if not image:
+        print('No Image Found')
         return
 
     image.thumbnail((THUMBSIZE, THUMBSIZE), Image.ANTIALIAS)
