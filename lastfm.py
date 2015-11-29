@@ -52,7 +52,14 @@ def get_album_info(mbid):
     artist = data['album']['artist']
     image = smallest
 
-    return title, artist, image
+    tracks = data['album']['tracks']
+
+    return {
+        'title': title,
+        'artist': artist,
+        'image': image,
+        'tracks': tracks
+    }
 
 
 if __name__ == '__main__':
