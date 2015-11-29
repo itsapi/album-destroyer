@@ -30,7 +30,7 @@ def play_wave(filename, length=10):
 
 def get_and_play(url):
     try:
-        os.system('youtube-dl -x --audio-format=wav -o song.tmp {}'.format(url))
+        os.system('youtube-dl -x --audio-format=wav -o song.tmp {} > /dev/null 2>&1'.format(url))
     except:
         pass
     else:
@@ -38,7 +38,7 @@ def get_and_play(url):
         return True
     finally:
         try:
-            os.system('rm song.wav')
+            os.system('rm song.wav > /dev/null 2>&1')
         except:
             pass
 
