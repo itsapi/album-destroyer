@@ -4,7 +4,7 @@ import urllib.request
 
 
 page = 0
-def get_tracks(user):
+def get_albums(user):
     global page
     page += 1
 

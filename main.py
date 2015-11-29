@@ -64,7 +64,7 @@ def scroll_image(image, offset):
 
 
 def main():
-    albums = lastfm.get_tracks('ollsllo')
+    albums = lastfm.get_albums('ollsllo')
     offset = HEIGHT
 
     answer = Input(HEIGHT - 1, 0)
