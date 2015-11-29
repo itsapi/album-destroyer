@@ -34,6 +34,7 @@ def get_image_from_url(url):
 
 def get_and_play(mbid, queue):
     play_barrier = threading.Barrier(2)
+    pause_music = threading.Event()
     stop_song = threading.Event()
 
     album = lastfm.get_album_info(mbid)
@@ -64,10 +65,10 @@ def get_and_play(mbid, queue):
                 print('Failed', e)
                 continue
             else:
-                queue.put((album, image, diff, play_barrier, stop_song))
+                queue.put((album, image, diff, play_barrier, pause_music, stop_song))
                 play_barrier.wait()
                 # print(video[0], 'Playing')
-                play.play_wave('videos/{}.wav'.format(video[1]), stop_song)
+                play.play_wave('videos/{}.wav'.format(video[1]), pause_music, stop_song)
                 return
             finally:
                 try:

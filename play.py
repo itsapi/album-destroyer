@@ -22,7 +22,7 @@ def noalsaerr():
     asound.snd_lib_error_set_handler(None)
 
 
-def play_wave(filename, stop):
+def play_wave(filename, pause, stop):
     CHUNK = 1024
 
     try:
@@ -42,6 +42,8 @@ def play_wave(filename, stop):
 
         start = time.time()
         while data != '' and time.time() < start + MUSIC_LENGTH and not stop.is_set():
+            while pause.is_set():
+                pass
             stream.write(data)
             data = wf.readframes(CHUNK)
 

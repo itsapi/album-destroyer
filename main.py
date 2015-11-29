@@ -1,4 +1,3 @@
-import sys
 import threading
 import sys
 from time import sleep
@@ -65,6 +64,13 @@ def display_image(y, x, diff):
     return out
 
 
+def sidebar_info(album, status):
+    return (POS_STR(int(HEIGHT / 2) + 3, 2, 'Last round results:') +
+            POS_STR(int(HEIGHT / 2) + 4, 2, status or 'No answer entered') +
+            POS_STR(int(HEIGHT / 2) + 5, 2, '{} - {}'.format(album['title'], album['artist'])) +
+            POS_STR(int(HEIGHT / 2) + 6, 2, 'Score {} of {}'.format(SCORE, TOTAL)))
+
+
 def scroll_image(diff, image, offset):
     print(END + display_image(offset, int(WIDTH / 2 - len(image[0])), diff) + BLACK)
 
@@ -96,12 +102,7 @@ def main(username):
         while True:
             if offset >= HEIGHT:
                 if album:
-                    out = END + WHITE
-                    out += POS_STR(int(HEIGHT / 2) + 3, 2, 'Last round results:')
-                    out += POS_STR(int(HEIGHT / 2) + 4, 2, status or 'No answer entered')
-                    out += POS_STR(int(HEIGHT / 2) + 5, 2, '{} - {}'.format(album['title'], album['artist']))
-                    out += POS_STR(int(HEIGHT / 2) + 6, 2, 'Score {} of {}'.format(SCORE, TOTAL))
-                    print(out + END + BLACK)
+                    print(END + WHITE + sidebar_info(album, status) + END + BLACK)
                     status = None
                     sleep(2)
 
@@ -110,7 +111,7 @@ def main(username):
                 stop_last_song.set()
                 queue_next_song(queue, albums)
 
-                album, image, diff, play_barrier, stop_last_song = queue.get(block=True)
+                album, image, diff, play_barrier, pause_music, stop_last_song = queue.get(block=True)
 
                 play_barrier.wait()
 
@@ -134,6 +135,18 @@ def main(username):
                     status = 'Correct answer!'
                 else:
                     status = 'Incorrect answer :-('
+            elif char == chr(27):
+                char = 0
+                msg = '---- PAUSED (esc to close, q to quit game) ----'
+                print(END + WHITE + sidebar_info(album, status) + END + BLACK)
+                print(WHITE + POS_STR(2, int((WIDTH-len(msg))/2), msg) + END)
+                pause_music.set()
+                while not char in (chr(27), chr(113)):
+                    char = nbi.char()
+                print(POS_STR(2, int((WIDTH-len(msg))/2), int((WIDTH-len(msg))/2) * ' ') + BLACK)
+                pause_music.clear()
+                if char == chr(113):
+                    sys.exit(0)
             elif char:
                 answer.add(char)
 
