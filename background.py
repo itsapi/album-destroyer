@@ -1,9 +1,11 @@
 import os
+import glob
 import threading
 from random import randint
 from PIL import Image
 from io import BytesIO
 from urllib import request
+from youtube_dl import YoutubeDL
 
 import lastfm
 import play
@@ -12,6 +14,7 @@ from youtube import youtube_search
 
 
 THUMBSIZE = 20
+BASE = 'videos'
 
 
 def image_diff(image):
@@ -57,22 +60,33 @@ def get_and_play(mbid, queue):
         videos = youtube_search(album['title'], album['artist'], track)
 
         for video in videos:
-            # print(video[0])
             try:
-                os.system('youtube-dl -x --audio-format=wav -o videos/%\(id\)s.tmp {} > /dev/null 2>&1'.format(video[1]))
+                opts = {
+                    'quiet': True,
+                    'no_warnings': True,
+                    'outtmpl': '{}/%(id)s.tmp'.format(BASE),
+                    'postprocessors': [{
+                        'key': 'FFmpegExtractAudio',
+                        'preferredcodec': 'wav'
+                    }]
+                }
+
+                with YoutubeDL(opts) as ydl:
+                    ydl.download([video[1]])
+
             except Exception as e:
                 print('Failed', e)
                 continue
             else:
                 queue.put((album, image, diff, play_barrier, pause_music, stop_song))
                 play_barrier.wait()
-                # print(video[0], 'Playing')
-                play.play_wave('videos/{}.wav'.format(video[1]), pause_music, stop_song)
+                play.play_wave('{}/{}.wav'.format(BASE, video[1]), pause_music, stop_song)
                 return
             finally:
                 try:
-                    os.system('rm videos/{}{{.wav,.tmp}} > /dev/null 2>&1'.format(video[1]))
-                except Exception as e:
+                    for f in glob.glob(video[1] + '.{wav,tmp,part}'):
+                        os.remove(os.path.join(BASE, f))
+                except OSError as e:
                     print('Error:', e)
 
 
